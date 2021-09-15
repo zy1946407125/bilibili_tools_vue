@@ -1,12 +1,202 @@
 <template>
     <div>
-      <h1>小号设置</h1>
+        <h1>小号设置</h1>
+        <div style="display: flex;flex-direction: row">
+            <el-button type="primary" @click="addAccount()" icon="el-icon-s-promotion">添加小号</el-button>
+            <div style="width: 300px"></div>
+            <el-input v-model="selectedAccount" clearable style="width: 300px" placeholder="请输入DedeUserID"></el-input>
+            <el-button type="primary" @click="filterAccount()" icon="el-icon-search">搜索</el-button>
+        </div>
+        <el-table
+                v-loading="loading2"
+                element-loading-text="正在刷新..."
+                element-loading-spinner="el-icon-loading"
+                :data="accountData"
+                stripe
+                style="width: 100%">
+            <el-table-column
+                    prop="dedeUserID"
+                    label="DedeUserID"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="buvid2"
+                    label="buvid2"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="buvid3"
+                    label="buvid3"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bili_jct"
+                    label="bili_jct"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="sessData"
+                    label="SESSDATA"
+                    width="180">
+            </el-table-column>
+            <el-table-column label="操作"
+                             width="180">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            type="warning"
+                            :disabled="scope.row.status=='运行'?true:false"
+                            @click="remove(scope.$index,scope.row)">移除
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-dialog title="新增小号" :visible.sync="dialogFormVisible" :show-close="false">
+            <el-form :model="accountDataReal" v-loading="loading"
+                     :element-loading-text="loading_text"
+                     element-loading-spinner="el-icon-loading">
+                <el-form-item label="DedeUserID">
+                    <el-input v-model="accountDataReal.dedeUserID" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="buvid2">
+                    <el-input v-model="accountDataReal.buvid2" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="buvid3">
+                    <el-input v-model="accountDataReal.buvid3" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="bili_jct">
+                    <el-input v-model="accountDataReal.bili_jct" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="SESSDATA">
+                    <el-input v-model="accountDataReal.sessData" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="cancel()">取 消</el-button>
+                <el-button type="primary" @click="submitAccount()">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
     export default {
-        name: "Account"
+        name: "Account",
+        data() {
+            return {
+                loading2: false,
+                selectedAccount: "",
+                accountData: [],
+                dialogFormVisible: false,
+                accountDataReal: {
+                    dedeUserID: "",
+                    buvid2: "",
+                    buvid3: "",
+                    bili_jct: "",
+                    sessData: ""
+                },
+                loading_text: "",
+                loading: false
+            }
+        },
+        methods: {
+            addAccount() {
+                this.dialogFormVisible = true
+            },
+            filterAccount() {
+                console.log(this.selectedAccount)
+                var that = this
+                axios.post('/getAccounts').then(resp => {
+                    console.log(resp)
+                    if (that.selectedAccount == "") {
+                        that.accountData = resp.data.accountData
+                    } else {
+                        let filterAccount = []
+                        for (let i = 0; i < resp.data.accountData.length; i++) {
+                            if (resp.data.accountData[i].dedeUserID == that.selectedAccount) {
+                                filterAccount.push(resp.data.accountData[i])
+                            }
+                        }
+                        that.accountData = filterAccount
+                    }
+                    console.log(that.accountData)
+                })
+            },
+            remove(index, row) {
+                this.loading2 = true
+                var that = this
+                var params = new URLSearchParams()
+                params.append('dedeUserID', row.dedeUserID)
+                axios.post("/removeAccount", params).then(resp => {
+                    console.log(resp)
+                    that.loading2 = false
+                    that.accountData = resp.data.accountData
+                    if (resp.data.code == 0) {
+                        that.$message.success("移除成功")
+                    } else {
+                        that.$message.warning("移除失败")
+                    }
+                })
+            },
+            cancel() {
+                this.dialogFormVisible = false
+                this.accountDataReal = {
+                    dedeUserID: "",
+                    buvid2: "",
+                    buvid3: "",
+                    bili_jct: "",
+                    sessData: ""
+                }
+            },
+            selectAccount() {
+                this.loading2 = true
+                var that = this
+                axios.post("/getAccounts").then(resp => {
+                    if (resp.data.code == 0) {
+                        that.loading2 = false
+                        that.accountData = resp.data.accountData
+                    }
+                })
+            },
+            submitAccount() {
+                if (this.accountDataReal.dedeUserID != "" && this.accountDataReal.buvid2 != "" && this.accountDataReal.buvid3 != "" && this.accountDataReal.bili_jct != "" && this.accountDataReal.sessData != "") {
+                    this.loading_text = "正在添加..."
+                    this.loading = true
+                    console.log(this.accountDataReal)
+                    var that = this
+                    var params = new URLSearchParams()
+                    params.append('dedeUserID', this.accountDataReal.dedeUserID)
+                    params.append('buvid2', this.accountDataReal.buvid2)
+                    params.append('buvid3', this.accountDataReal.buvid3)
+                    params.append('bili_jct', this.accountDataReal.bili_jct)
+                    params.append('sessData', this.accountDataReal.sessData)
+                    axios.post("/addAccount", params).then(resp => {
+                        this.loading = false
+                        console.log(resp)
+                        if (resp.data.code == 0) {
+                            that.$message.success("添加成功")
+                            that.accountDataReal = {
+                                dedeUserID: "",
+                                buvid2: "",
+                                buvid3: "",
+                                bili_jct: "",
+                                sessData: ""
+                            }
+                            that.accountData = resp.data.accountData
+                            that.dialogFormVisible = false
+                        } else {
+                            that.$message.warning("添加失败")
+                            that.accountData = resp.data.accountData
+                        }
+                    })
+                } else {
+                    this.$message.error("请填写完整信息")
+                }
+            },
+        },
+        created() {
+            this.selectAccount()
+        }
     }
 </script>
 

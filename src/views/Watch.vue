@@ -22,29 +22,32 @@
             <el-table-column
                     prop="bvid"
                     label="视频ID"
-                    width="180">
+                    width="130">
             </el-table-column>
             <el-table-column
                     prop="title"
                     label="标题"
-                    width="180">
+                    width="150">
             </el-table-column>
             <el-table-column
                     prop="author"
                     label="作者"
-                    width="120">
+                    width="110">
             </el-table-column>
             <el-table-column
                     prop="startWatchNum"
-                    label="开始播放数">
+                    label="开始播放数"
+                    width="110">
             </el-table-column>
             <el-table-column
                     prop="nowWatchNum"
-                    label="当前播放数">
+                    label="当前播放数"
+                    width="110">
             </el-table-column>
             <el-table-column
                     prop="needWatchNum"
-                    label="下单数量">
+                    label="下单数量"
+                    width="110">
             </el-table-column>
             <el-table-column
                     prop="startTimeStr"
@@ -168,7 +171,7 @@
             filterBVData() {
                 console.log(this.selectedBVID)
                 var that = this
-                axios.post('/getBVInfoList').then(resp => {
+                axios.post('/getWatchBVInfoList').then(resp => {
                     console.log(resp)
                     if (that.selectedBVID == "") {
                         that.watchData = resp.data
@@ -208,7 +211,7 @@
             },
             updateTable() {
                 var that = this
-                axios.post('/getBVInfoList').then(resp => {
+                axios.post('/getWatchBVInfoList').then(resp => {
                     console.log(resp)
                     that.watchData = resp.data
                 })
@@ -287,7 +290,7 @@
                             that.BVDataReal.startView = resp.data.bvinfo.data.stat.view
                             that.BVDataReal.startLike = resp.data.bvinfo.data.stat.like
                             that.BVDataReal.nowView = resp.data.bvinfo.data.stat.view
-                            that.BVDataReal.nowtLike = resp.data.bvinfo.data.stat.like
+                            that.BVDataReal.nowLike = resp.data.bvinfo.data.stat.like
                             that.threadNumMax = resp.data.watchThreadNum
                         } else {
                             that.$message.error("错误代码：" + resp.data.code + "    错误内容：" + resp.data.message)
@@ -299,7 +302,7 @@
                 this.dialogFormVisible = true
             },
             submitTask() {
-                if (this.BVDataReal.title != "" && this.BVDataReal.name != "" && this.BVDataReal.view != "") {
+                if (this.BVDataReal.title != "") {
                     this.loading_text = "正在提交..."
                     this.loading = true
                     // this.BVDataReal.startTimeStamp = parseInt(new Date().getTime() / 1000)
@@ -313,7 +316,7 @@
                     params.append('startWatchNum', this.BVDataReal.startView)
                     params.append('startLikeNum', this.BVDataReal.startLike)
                     params.append('nowWatchNum', this.BVDataReal.nowView)
-                    params.append('nowLikeNum', this.BVDataReal.nowtLike)
+                    params.append('nowLikeNum', this.BVDataReal.nowLike)
                     params.append('needWatchNum', this.BVDataReal.needWatchNum)
                     params.append('threadNum', this.BVDataReal.threadNum)
                     params.append('taskType', "播放")

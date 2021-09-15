@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <el-container style="height: 960px; border: 1px solid #eee">
-      <el-aside width="250px" style="background-color: rgb(238, 241, 246)">
+      <el-aside width="150px" style="background-color: rgb(238, 241, 246)">
         <el-menu :default-openeds="['1', '2']" router>
           <el-submenu index="1">
             <template slot="title"><i class="el-icon-s-claim"></i>任务列表</template>
@@ -30,16 +30,6 @@
 
 <script>
   export default {
-    data() {
-      const item = {
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      };
-      return {
-        tableData: Array(20).fill(item)
-      }
-    }
   };
 </script>
 
