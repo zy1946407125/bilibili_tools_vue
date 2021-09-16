@@ -4,6 +4,7 @@ import Account from "../views/Account";
 import Like from "../views/Like";
 import Proxy from "../views/Proxy";
 import Watch from "../views/Watch";
+import Follow from "../views/Follow";
 
 Vue.use(VueRouter)
 
@@ -22,6 +23,11 @@ const routes = [
         path: '/watch',
         name: 'Watch',
         component: Watch
+    },
+    {
+        path: '/follow',
+        name: 'Follow',
+        component: Follow
     },
     {
         path: '/account',

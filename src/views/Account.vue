@@ -39,6 +39,26 @@
                     label="SESSDATA"
                     width="180">
             </el-table-column>
+            <el-table-column
+                    prop="likeRequestNum"
+                    label="点赞请求次数"
+                    width="110">
+            </el-table-column>
+            <el-table-column
+                    prop="likeSuccessNum"
+                    label="点赞成功次数"
+                    width="110">
+            </el-table-column>
+            <el-table-column
+                    prop="followRequestNum"
+                    label="关注请求次数"
+                    width="110">
+            </el-table-column>
+            <el-table-column
+                    prop="followSuccessNum"
+                    label="关注成功次数"
+                    width="110">
+            </el-table-column>
             <el-table-column label="操作"
                              width="180">
                 <template slot-scope="scope">

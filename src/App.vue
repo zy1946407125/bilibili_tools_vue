@@ -7,6 +7,7 @@
             <template slot="title"><i class="el-icon-s-claim"></i>任务列表</template>
             <el-menu-item index="/watch">播放任务</el-menu-item>
             <el-menu-item index="/like">点赞任务</el-menu-item>
+            <el-menu-item index="/follow">关注任务</el-menu-item>
           </el-submenu>
           <el-submenu index="2">
             <template slot="title"><i class="el-icon-s-tools"></i>配置中心</template>
