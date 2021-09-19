@@ -13,6 +13,7 @@
             <template slot="title"><i class="el-icon-s-tools"></i>配置中心</template>
             <el-menu-item index="/proxy">代理设置</el-menu-item>
             <el-menu-item index="/account">小号设置</el-menu-item>
+            <el-menu-item index="/goodsIDAndKey">商品设置</el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
