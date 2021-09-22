@@ -15,6 +15,10 @@
             <el-form-item label="代理端口" prop="proxyPort">
                 <el-input type="number" v-model="ruleForm.proxyPort" autocomplete="off" style="width: 800px"></el-input>
             </el-form-item>
+            <el-form-item label="代理状态" prop="proxyOpen">
+                <el-radio v-model="ruleForm.proxyOpen" label="1">开启</el-radio>
+                <el-radio v-model="ruleForm.proxyOpen" label="2">关闭</el-radio>
+            </el-form-item>
         </el-form>
         <el-button @click="updateProxyInfo()">更新</el-button>
     </div>
@@ -30,6 +34,7 @@
                     proxyPass: "",
                     proxyHost: "",
                     proxyPort: "",
+                    proxyOpen: ""
                 },
                 loading: false
             }
@@ -37,7 +42,7 @@
         methods: {
             updateProxyInfo() {
                 console.log(this.ruleForm)
-                if (this.ruleForm.proxyUser == "" || this.ruleForm.proxyPass == "" || this.ruleForm.proxyHost == "" || this.ruleForm.proxyPort == "") {
+                if (this.ruleForm.proxyUser == "" || this.ruleForm.proxyPass == "" || this.ruleForm.proxyHost == "" || this.ruleForm.proxyPort == "" || this.ruleForm.proxyOpen == "") {
                     this.$message.error("请输入完整信息")
                 } else {
                     this.loading = true
@@ -47,6 +52,11 @@
                     params.append('proxyPass', this.ruleForm.proxyPass)
                     params.append('proxyHost', this.ruleForm.proxyHost)
                     params.append('proxyPort', this.ruleForm.proxyPort)
+                    if (this.ruleForm.proxyOpen == "1") {
+                        params.append('proxyOpen', "true")
+                    } else {
+                        params.append('proxyOpen', "false")
+                    }
                     axios.post("/updateProxyInfo", params).then(resp => {
                         console.log(resp)
                         that.loading = false
@@ -70,6 +80,7 @@
                     that.ruleForm.proxyPass = resp.data.data.proxyPass
                     that.ruleForm.proxyHost = resp.data.data.proxyHost
                     that.ruleForm.proxyPort = resp.data.data.proxyPort
+                    that.ruleForm.proxyOpen = resp.data.data.proxyOpen == true ? "1" : "2"
                 } else {
                     that.$message.error("获取代理配置信息失败")
                 }

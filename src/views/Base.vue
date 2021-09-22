@@ -3,13 +3,8 @@
 </template>
 
 <script>
-    // const BASE_URL = 'http://172.17.193.41:8080/maintainSystem'; // 设置全局 URL   真实环境设ip
-    // const BASE_URL = 'http://106.12.128.109:8080/maintainSystem'; // 设置全局 URL   真实环境设ip
-    const BASE_URL = 'http://120.25.237.24:9002'; // 设置全局 URL   开发环境
+    const BASE_URL = 'http://120.25.237.24:9002'; // 设置全局 URL   生产环境
     // const BASE_URL = 'http://localhost:9002'; // 设置全局 URL   开发环境
-    // const BASE_URL = 'https://magic233.top/maintainSystem'; // 设置全局 URL   开发环境
-    // const BASE_URL = 'http://106.12.128.109:443'; // 设置全局 URL   开发环境
-    // const BASE_URL = 'http://192.168.140.145:8080/maintainSystem'; // 设置全局 URL   开发环境
     export default{
         BASE_URL
     }
