@@ -4,6 +4,8 @@
         <div style="display: flex;flex-direction: row">
             <el-button type="primary" @click="addAccount()" icon="el-icon-s-promotion">添加小号</el-button>
             <div style="width: 300px"></div>
+            <el-button type="primary" @click="addAccount2()" icon="el-icon-s-promotion">批量导入</el-button>
+            <div style="width: 300px"></div>
             <el-input v-model="selectedAccount" clearable style="width: 300px" placeholder="请输入DedeUserID"></el-input>
             <el-button type="primary" @click="filterAccount()" icon="el-icon-search">搜索</el-button>
         </div>
@@ -96,6 +98,47 @@
                 <el-button type="primary" @click="submitAccount()">确 定</el-button>
             </div>
         </el-dialog>
+        <el-dialog title="批量导入" :visible.sync="dialogFormVisible2" :show-close="false">
+            <el-input type="textarea"
+                      :rows="5"
+                      v-model="accountText"
+                      autocomplete="off" placeholder="不同账号间用换行(回车)隔开"></el-input>
+            <el-button @click="importAccount()">导入</el-button>
+            <el-table
+                    :data="accountDataTable"
+                    stripe
+                    style="width: 100%">
+                <el-table-column
+                        prop="dedeUserID"
+                        label="DedeUserID"
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="buvid2"
+                        label="buvid2"
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="buvid3"
+                        label="buvid3"
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="bili_jct"
+                        label="bili_jct"
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="sessData"
+                        label="SESSDATA"
+                        width="180">
+                </el-table-column>
+            </el-table>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="cancel2()">取 消</el-button>
+                <el-button type="primary" @click="submitAccount2()">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -107,7 +150,9 @@
                 loading2: false,
                 selectedAccount: "",
                 accountData: [],
+                accountDataTable: [],
                 dialogFormVisible: false,
+                dialogFormVisible2: false,
                 accountDataReal: {
                     dedeUserID: "",
                     buvid2: "",
@@ -116,12 +161,16 @@
                     sessData: ""
                 },
                 loading_text: "",
-                loading: false
+                loading: false,
+                accountText: "",
             }
         },
         methods: {
             addAccount() {
                 this.dialogFormVisible = true
+            },
+            addAccount2() {
+                this.dialogFormVisible2 = true
             },
             filterAccount() {
                 console.log(this.selectedAccount)
@@ -168,6 +217,18 @@
                     sessData: ""
                 }
             },
+            cancel2() {
+                this.dialogFormVisible2 = false
+                this.accountDataReal = {
+                    dedeUserID: "",
+                    buvid2: "",
+                    buvid3: "",
+                    bili_jct: "",
+                    sessData: ""
+                }
+                this.accountDataTable = []
+                this.accountText = ""
+            },
             selectAccount() {
                 this.loading2 = true
                 var that = this
@@ -211,6 +272,130 @@
                     })
                 } else {
                     this.$message.error("请填写完整信息")
+                }
+            },
+            importAccount() {
+                console.log(this.accountText)
+                this.accountDataTable = [];
+                let accounts = this.accountText.split("\n");
+                for (let i = 0; i < accounts.length; i++) {
+                    let DedeUserID = accounts[i].match(/DedeUserID=(\S*);/);
+                    if (DedeUserID != null && DedeUserID.length >= 2) {
+                        this.accountDataReal.dedeUserID = DedeUserID[1]
+                    } else {
+                        this.$message.error("DedeUserID为null，请核实")
+                    }
+
+                    let buvid2 = accounts[i].match(/buvid2=(\S*);/);
+                    let buvid3 = accounts[i].match(/buvid3=(\S*);/);
+                    if (buvid2 == null && buvid3 == null) {
+                        this.$message.error("buvid2与buvid3均为null，请核实")
+                    }
+                    if (buvid2 != null && buvid2.length >= 2) {
+                        this.accountDataReal.buvid2 = buvid2[1]
+                    } else {
+                        this.accountDataReal.buvid2 = buvid3[1]
+                    }
+                    if (buvid3 != null && buvid3.length >= 2) {
+                        this.accountDataReal.buvid3 = buvid3[1]
+                    } else {
+                        this.accountDataReal.buvid3 = buvid2[1]
+                    }
+
+                    let bili_jct = accounts[i].match(/bili_jct=(\S*);/);
+                    if (bili_jct != null && bili_jct.length >= 2) {
+                        this.accountDataReal.bili_jct = bili_jct[1]
+                    } else {
+                        this.$message.error("bili_jct为null，请核实")
+                    }
+
+                    let SESSDATA = accounts[i].match(/SESSDATA=(\S*);/);
+                    if (SESSDATA != null && SESSDATA.length >= 2) {
+                        this.accountDataReal.sessData = SESSDATA[1]
+                    } else {
+                        this.$message.error("SESSDATA为null，请核实")
+                    }
+
+                    this.accountDataTable.push(this.accountDataReal)
+                    this.accountDataReal = {
+                        dedeUserID: "",
+                        buvid2: "",
+                        buvid3: "",
+                        bili_jct: "",
+                        sessData: ""
+                    }
+                }
+                console.log(this.accountDataTable)
+            },
+            submitAccount2() {
+                if (this.accountDataTable.length == 0) {
+                    this.$message.error("请输入账号信息")
+                } else {
+                    let i = 0;
+                    for (i = 0; i < this.accountDataTable.length; i++) {
+                        console.log(this.accountDataTable[i].dedeUserID)
+                        if (this.accountDataTable[i].dedeUserID == "" || this.accountDataTable[i].dedeUserID == null) {
+                            this.$message.error("第" + (i + 1) + "个账号dedeUserID为null")
+                            break
+                        }
+                    }
+                    if (i == this.accountDataTable.length) {
+                        this.loading_text = "正在添加..."
+                        this.loading = true
+                        var that = this
+                        var params = new URLSearchParams()
+                        params.append('accounts', JSON.stringify(this.accountDataTable))
+                        axios({
+                            url: "/addAccounts",
+                            method: "post",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            data: JSON.stringify(this.accountDataTable)
+                        }).then(resp => {
+                            this.loading = false
+                            console.log(resp)
+                            if (resp.data.code == 0) {
+                                that.$message.success("添加成功")
+                                this.accountDataReal = {
+                                    dedeUserID: "",
+                                    buvid2: "",
+                                    buvid3: "",
+                                    bili_jct: "",
+                                    sessData: ""
+                                }
+                                this.accountDataTable = []
+                                this.accountText = ""
+                                that.accountData = resp.data.accountData
+                                that.dialogFormVisible = false
+                            } else {
+                                that.$message.warning("添加失败")
+                                that.accountData = resp.data.accountData
+                            }
+                        })
+
+                        // axios.post("/addAccounts", params).then(resp => {
+                        //     this.loading = false
+                        //     console.log(resp)
+                        //     if (resp.data.code == 0) {
+                        //         that.$message.success("添加成功")
+                        //         this.accountDataReal = {
+                        //             dedeUserID: "",
+                        //             buvid2: "",
+                        //             buvid3: "",
+                        //             bili_jct: "",
+                        //             sessData: ""
+                        //         }
+                        //         this.accountDataTable = []
+                        //         this.accountText = ""
+                        //         that.accountData = resp.data.accountData
+                        //         that.dialogFormVisible = false
+                        //     } else {
+                        //         that.$message.warning("添加失败")
+                        //         that.accountData = resp.data.accountData
+                        //     }
+                        // })
+                    }
                 }
             },
         },
