@@ -19,6 +19,11 @@
             <!--                    label="任务ID"-->
             <!--                    width="50">-->
             <!--            </el-table-column>-->
+            <el-table-column align="center" type="index" width="60" label="序号">
+                <template slot-scope="scope">
+                    {{scope.$index + 1}}
+                </template>
+            </el-table-column>
             <el-table-column
                     prop="mid"
                     label="用户id"
